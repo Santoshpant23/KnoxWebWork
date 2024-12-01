@@ -21,6 +21,10 @@ app.use("/question", question);
 
 app.use("/admin", owners);
 
+app.get("/", (req: any, res: any) => {
+  return res.send("Healthy Server");
+});
+
 app.listen(port, () => {
   console.log("Healthy");
 });
