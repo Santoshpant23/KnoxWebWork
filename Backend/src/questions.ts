@@ -125,10 +125,37 @@ question.post("/add", async (req: any, res: any) => {
   }
 });
 
-question.get("/checkans", (req: any, res: any) => {
+question.get("/checkans", async (req: any, res: any) => {
   try {
     //todo: implement logic to check answer
     //----------------
+    const cookie = req.body.cookie;
+    //logic to verify if a student is logged in or not
+    const { questionId, option } = req.body;
+    const getQn = await prisma.question.findFirst({
+      where: {
+        id: questionId,
+      },
+    });
+
+    if (!getQn) {
+      return res.json({
+        success: false,
+        message: "Question not found :(",
+      });
+    }
+
+    if (option == getQn.correct) {
+      return res.json({
+        success: true,
+        isCorrect: true,
+      });
+    }
+
+    return res.json({
+      success: true,
+      isCorrect: false,
+    });
   } catch (e: any) {
     return res.json({
       success: false,
