@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function(){
     return(
         <div className="mt-5 p-2">
@@ -7,7 +9,7 @@ export default function(){
            </div>
 
            <div className="mt-5 text-blue-500">
-            <a href="/">Course Administration</a>
+            <Link to="/signup">Course Administration</Link>
            </div>
 
            <div className="mt-5">

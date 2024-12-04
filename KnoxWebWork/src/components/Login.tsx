@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function (){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
    async function handleLogin(){
         if(email.length<5){
@@ -31,6 +33,10 @@ export default function (){
             }
         }
     }
+
+    function gotoSignup(){
+        navigate("/signup")
+    }
     return(
         <div className="h-5/6 p-10">
         <div className="font-semibold text-2xl mt-20">
@@ -50,6 +56,9 @@ export default function (){
             </div>
             <div >
                 <button className="bg-blue-800 p-2 text-white rounded-xl font-semibold hover:bg-blue-900" onClick={handleLogin}>Continue</button>
+            </div>
+            <div className="mt-5">
+                New User? <span className="text-blue-700 font-semibold italic underline cursor-pointer" onClick={gotoSignup}>SignUp</span>
             </div>
         </div>
     </div>

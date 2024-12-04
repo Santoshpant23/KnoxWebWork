@@ -1,11 +1,15 @@
 import { useState } from "react"
+import {   useNavigate } from "react-router-dom";
 
 export default function(){
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const navigate = useNavigate();
+    
    async function handleSignup(){
+
+
         if(name.length < 1){
             alert("Please give a valid name");
         } else if (email.length<6){
@@ -35,6 +39,11 @@ export default function(){
         }
 
 
+        
+        
+    }
+    function gotoLogin(){
+      navigate("/login")
     }
     return(
         <div className="h-5/6 p-10">
@@ -58,6 +67,9 @@ export default function(){
                 </div>
                 <div >
                     <button className="bg-blue-800 p-2 text-white rounded-xl font-semibold hover:bg-blue-900" onClick={handleSignup} >Signup</button>
+                </div>
+                <div className="mt-5">
+                    Already have an account? <span className="text-blue-700 font-semibold italic cursor-pointer underline" onClick={gotoLogin}>Login</span>
                 </div>
             </div>
         </div>
