@@ -4,10 +4,13 @@ import course from "./course";
 import exercise from "./exercises";
 import question from "./questions";
 import owners from "./owners";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+
+app.use(cors());
 
 const port = 3003;
 

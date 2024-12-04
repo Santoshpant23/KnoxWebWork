@@ -46,7 +46,7 @@ owners.post("/signup", async (req: any, res: any) => {
   }
 });
 
-owners.get("/login", async (req: any, res: any) => {
+owners.post("/login", async (req: any, res: any) => {
   try {
     const { email, password } = req.body;
 
