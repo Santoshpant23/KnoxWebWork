@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useToken } from "./TokenContext";
 
+interface CourseProps {
+  name: string;
+  ownedBy: string;
+  students: { id: number; name: string }[];
+  term: string;
+  exercises: { id: number; title: string }[];
+}
+
 export default function Courses() {
   const { token } = useToken();
-  const [courses, setCourses] = useState<string[] | null>(null);
+  const [courses, setCourses] = useState<CourseProps[] | null>(null);
   const [loading, setLoading] = useState(true); // To handle the loading state
 
   useEffect(() => {
@@ -57,13 +65,13 @@ export default function Courses() {
             <p>Loading courses...</p>
           ) : courses && courses.length > 0 ? (
             <ul className="w-2/3">
-              {courses.map((course: string, index: number) => (
+              {courses.map((course: CourseProps, index: number) => (
                 <li
                   key={index}
                   className="p-2 bg-slate-300 text-blue-900 hover:bg-blue-800 hover:text-white cursor-pointer m-2"
                 >
                   <a href="/" className="font-bold">
-                    {course}
+                    {course.name+"-"+course.term}
                   </a>
                 </li>
               ))}
