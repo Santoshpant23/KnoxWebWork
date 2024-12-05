@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToken } from "./TokenContext";
 
 export default function (){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
+    const {token, setToken} = useToken();
 
    async function handleLogin(){
         if(email.length<5){
@@ -28,6 +31,10 @@ export default function (){
                 alert("Success");
                 setEmail("");
                 setPassword("");
+             localStorage.setItem("token", data.token);
+              await setToken(data.token);
+                // alert(localStorage.getItem("token"));
+                navigate("/");
             } else{
                 alert("Wrong credentials, try again")
             }
@@ -38,7 +45,7 @@ export default function (){
         navigate("/signup")
     }
     return(
-        <div className="h-5/6 p-10">
+        <div className="h-screen p-10">
         <div className="font-semibold text-2xl mt-20">
         Course Administration
         </div>

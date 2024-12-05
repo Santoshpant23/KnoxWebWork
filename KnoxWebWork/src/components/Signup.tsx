@@ -1,11 +1,14 @@
 import { useState } from "react"
 import {   useNavigate } from "react-router-dom";
+import { useToken } from "./TokenContext";
 
 export default function(){
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
+    const {token, setToken} = useToken();
     
    async function handleSignup(){
 
@@ -32,6 +35,9 @@ export default function(){
                 setName("");
                 setEmail("");
                 setPassword("");
+                 await localStorage.setItem('token', data.token);
+                 setToken(data.token);
+                 navigate("/");
             } else{
                 alert(data.message)
             }
@@ -46,7 +52,7 @@ export default function(){
       navigate("/login")
     }
     return(
-        <div className="h-5/6 p-10">
+        <div className="h-screen p-10">
             <div className="font-semibold text-2xl mt-20">
             Course Administration
             </div>

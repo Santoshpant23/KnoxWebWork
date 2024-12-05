@@ -103,4 +103,50 @@ owners.get("/verify", (req: any, res: any) => {
     });
   }
 });
+
+owners.post("/details", async (req: any, res: any) => {
+  try {
+    const token = req.body.token;
+    if (!token) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+    // console.log(token);
+
+    const verifyPerson = (await jwt.verify(token, SECRET)) as { email: string };
+    // console.log("Error is not above");
+
+    if (!verifyPerson) {
+      return res.json({
+        success: false,
+        message: "Cannot verify admin",
+      });
+    }
+
+    const getPerson = await prisma.owners.findFirst({
+      where: {
+        email: verifyPerson.email,
+      },
+    });
+
+    if (!getPerson) {
+      return res.json({
+        success: false,
+        message: "No such user found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      details: getPerson,
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
 export default owners;

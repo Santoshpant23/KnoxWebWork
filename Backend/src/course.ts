@@ -32,7 +32,7 @@ course.get("/allcourses", async (req: Request, res: Response) => {
 course.post("/add-course", async (req, res) => {
   try {
     const token = req.body.token;
-    const verifyToken = jwt.verify(token, SECRET) as { email: string };
+    const verifyToken = jwt.verify(token, SECRET);
     if (!verifyToken) {
       res.json({
         message: "Invalid Token",
@@ -40,8 +40,10 @@ course.post("/add-course", async (req, res) => {
       });
     }
 
+    const owner = verifyToken;
+
     const getOwner = await prisma.owners.findFirst({
-      where: { email: verifyToken.email },
+      where: { email: verifyToken as string },
     });
 
     if (!getOwner) {
@@ -50,6 +52,8 @@ course.post("/add-course", async (req, res) => {
         success: false,
       });
     }
+
+    console.log(getOwner?.email);
 
     /*
     model Course {
@@ -65,6 +69,8 @@ course.post("/add-course", async (req, res) => {
 
     const { name, term } = req.body;
 
+    console.log(name + " " + term);
+
     if (!name || !term) {
       res.json({
         success: false,
@@ -76,7 +82,7 @@ course.post("/add-course", async (req, res) => {
       data: {
         name: name,
         term: term,
-        ownedBy: verifyToken.email,
+        ownedBy: owner as string,
       },
     });
     res.json({
@@ -85,8 +91,44 @@ course.post("/add-course", async (req, res) => {
     });
   } catch (e: any) {
     res.json({
-      message: e.message(),
+      message: e.message,
       success: false,
+    });
+  }
+});
+
+course.post("/mycourses", async (req: any, res: any) => {
+  try {
+    const token = req.body.token;
+    if (!token) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    const verifyToken = (await jwt.verify(token, SECRET)) as { email: string };
+    if (!verifyToken) {
+      return res.json({
+        message: "Cannot verify user, try again",
+        success: false,
+      });
+    }
+
+    const findAllCourses = await prisma.course.findMany({
+      where: {
+        ownedBy: verifyToken.email,
+      },
+    });
+
+    return res.json({
+      courses: findAllCourses,
+      success: true,
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
     });
   }
 });

@@ -17,7 +17,7 @@ datasource db {
 
 model Course {
   id        Int        @id @default(autoincrement())
-  name      String     @unique
+  name      String
   term      String
   students  Student[]
   exercises Exercise[]
