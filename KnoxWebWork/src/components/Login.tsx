@@ -29,6 +29,7 @@ export default function (){
             const data = await response.json();
 
             if(data.success){
+                //I commented this
                 // alert("Success");
                 setEmail("");
                 setPassword("");
