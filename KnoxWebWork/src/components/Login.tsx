@@ -8,6 +8,7 @@ export default function (){
     const navigate = useNavigate();
 
     const {token, setToken} = useToken();
+    const [error, SetError] = useState (false);
 
    async function handleLogin(){
         if(email.length<5){
@@ -28,7 +29,7 @@ export default function (){
             const data = await response.json();
 
             if(data.success){
-                alert("Success");
+                // alert("Success");
                 setEmail("");
                 setPassword("");
              localStorage.setItem("token", data.token);
@@ -36,7 +37,7 @@ export default function (){
                 // alert(localStorage.getItem("token"));
                 navigate("/");
             } else{
-                alert("Wrong credentials, try again")
+                SetError(true);
             }
         }
     }
@@ -50,6 +51,7 @@ export default function (){
         Course Administration
         </div>
         <div className="mt-5">
+            {error == true && <div className = "bg-red-100 rounded-md p-3 mb-3" >Invalid user ID or password</div>}
             <p>
                 Please enter your username and password for <b>admin</b> below:
             </p>
