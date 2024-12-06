@@ -107,6 +107,8 @@ owners.get("/verify", (req: any, res: any) => {
 owners.post("/details", async (req: any, res: any) => {
   try {
     const token = req.body.token;
+    // console.log("Token I got from profile page is " + token);
+
     if (!token) {
       return res.json({
         success: false,
@@ -115,8 +117,9 @@ owners.post("/details", async (req: any, res: any) => {
     }
     // console.log(token);
 
-    const verifyPerson = (await jwt.verify(token, SECRET)) as { email: string };
+    const verifyPerson = await jwt.verify(token, SECRET);
     // console.log("Error is not above");
+    // console.log("Verify Person got me  " + verifyPerson);
 
     if (!verifyPerson) {
       return res.json({
@@ -127,7 +130,7 @@ owners.post("/details", async (req: any, res: any) => {
 
     const getPerson = await prisma.owners.findFirst({
       where: {
-        email: verifyPerson.email,
+        email: verifyPerson as string,
       },
     });
 
@@ -137,6 +140,13 @@ owners.post("/details", async (req: any, res: any) => {
         message: "No such user found",
       });
     }
+
+    // console.log(
+    //   "Got the person with these details " +
+    //     getPerson.name +
+    //     " " +
+    //     getPerson.email
+    // );
 
     return res.json({
       success: true,

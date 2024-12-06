@@ -19,6 +19,9 @@ export default function CoursePage() {
   const { token } = useToken();
   const navigate = useNavigate();
 
+  // console.log("I am inside profile and my current token is  " + token);
+  
+
   const [courses, setCourses] = useState<CourseProps[] | null>(null);
   const [profile, setProfile] = useState<ProfileProps | null>(null);
   const [loadingP, setLoadingP] = useState(true);

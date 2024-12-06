@@ -107,7 +107,7 @@ course.post("/mycourses", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = (await jwt.verify(token, SECRET)) as { email: string };
+    const verifyToken = await jwt.verify(token, SECRET);
     if (!verifyToken) {
       return res.json({
         message: "Cannot verify user, try again",
@@ -117,7 +117,7 @@ course.post("/mycourses", async (req: any, res: any) => {
 
     const findAllCourses = await prisma.course.findMany({
       where: {
-        ownedBy: verifyToken.email,
+        ownedBy: verifyToken as string,
       },
     });
 
