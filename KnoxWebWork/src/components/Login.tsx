@@ -8,6 +8,7 @@ export default function (){
     const navigate = useNavigate();
 
     const {token, setToken} = useToken();
+    const [error, SetError] = useState (false);
 
     const [wrongdata, setWrongData] = useState(false);
 
@@ -30,6 +31,7 @@ export default function (){
             const data = await response.json();
 
             if(data.success){
+                //I commented this
                 // alert("Success");
                 setEmail("");
                 setPassword("");
@@ -39,8 +41,7 @@ export default function (){
                 setWrongData(false);
                 navigate("/");
             } else{
-                //todo
-                setWrongData(true);
+                SetError(true);
             }
         }
     }
@@ -54,7 +55,7 @@ export default function (){
         Course Administration
         </div>
         <div className="mt-5">
-           {wrongdata && ( <div className="bg-red-200 p-4 rounded-lg w-1/2 mb-2">Invalid user ID or password</div>)}
+            {error == true && <div className = "bg-red-100 rounded-md p-3 mb-3" >Invalid user ID or password</div>}
             <p>
                 Please enter your username and password for <b>admin</b> below:
             </p>
