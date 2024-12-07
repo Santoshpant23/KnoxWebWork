@@ -9,6 +9,8 @@ export default function (){
 
     const {token, setToken} = useToken();
 
+    const [wrongdata, setWrongData] = useState(false);
+
    async function handleLogin(){
         if(email.length<5){
             alert("Invalid Email, try again");
@@ -28,15 +30,17 @@ export default function (){
             const data = await response.json();
 
             if(data.success){
-                alert("Success");
+                // alert("Success");
                 setEmail("");
                 setPassword("");
              localStorage.setItem("token", data.token);
               await setToken(data.token);
                 // alert(localStorage.getItem("token"));
+                setWrongData(false);
                 navigate("/");
             } else{
-                alert("Wrong credentials, try again")
+                //todo
+                setWrongData(true);
             }
         }
     }
@@ -50,6 +54,7 @@ export default function (){
         Course Administration
         </div>
         <div className="mt-5">
+           {wrongdata && ( <div className="bg-red-200 p-4 rounded-lg w-1/2 mb-2">Invalid user ID or password</div>)}
             <p>
                 Please enter your username and password for <b>admin</b> below:
             </p>

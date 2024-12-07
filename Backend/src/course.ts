@@ -119,6 +119,10 @@ course.post("/mycourses", async (req: any, res: any) => {
       where: {
         ownedBy: verifyToken as string,
       },
+      include: {
+        students: true,
+        exercises: true,
+      },
     });
 
     return res.json({

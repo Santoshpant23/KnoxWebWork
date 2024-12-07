@@ -89,6 +89,10 @@ export default function CoursePage() {
     }
   }
 
+  function gotoCourse(course: CourseProps){
+    navigate("/edit-course", { state: { course } });
+  }
+
   function EachCourse({ course }: { course: CourseProps }) {
     const coursename = course.name;
     const term = course.term;
@@ -96,7 +100,9 @@ export default function CoursePage() {
     const totalStudents = course.students?.length || 0;
   
     return (
-      <div className="p-4 border border-gray-300 rounded-lg shadow-md bg-white">
+      <div className="p-4 border border-gray-300 rounded-lg shadow-md bg-white cursor-pointer hover:bg-slate-100" onClick={()=>{
+        gotoCourse(course);
+      }} >
         <h3 className="text-lg font-semibold text-blue-600">{coursename}</h3>
         <ul className="mt-2 text-gray-600 space-y-1">
           <li>

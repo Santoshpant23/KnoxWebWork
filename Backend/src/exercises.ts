@@ -58,7 +58,7 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as { email: string };
+    const verifyToken = jwt.verify(token, SECRET);
 
     if (!verifyToken) {
       return res.json({
@@ -69,7 +69,7 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
 
     const getOwner = prisma.owners.findFirst({
       where: {
-        email: verifyToken.email,
+        email: verifyToken as string,
       },
     });
 
@@ -83,7 +83,7 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
     const course = prisma.course.findFirst({
       where: {
         id: courseId,
-        ownedBy: verifyToken.email,
+        ownedBy: verifyToken as string,
       },
     });
 

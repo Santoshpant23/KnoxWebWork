@@ -23,7 +23,7 @@ student.post("/add-students", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as { email: string };
+    const verifyToken = jwt.verify(token, SECRET);
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -52,7 +52,7 @@ student.post("/add-students", async (req: any, res: any) => {
     const getCourse = await prisma.course.findFirst({
       where: {
         id: courseId,
-        ownedBy: verifyToken.email,
+        ownedBy: verifyToken as string,
       },
     });
 
@@ -63,12 +63,21 @@ student.post("/add-students", async (req: any, res: any) => {
       });
     }
 
-    await prisma.student.create({
+    const student = await prisma.student.create({
       data: {
         username: username,
         password: password,
         name: name,
         courseId: courseId,
+      },
+    });
+
+    await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        students: {
+          connect: { id: student.id },
+        },
       },
     });
 
