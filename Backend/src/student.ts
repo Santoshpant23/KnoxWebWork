@@ -157,4 +157,78 @@ student.get("./verify", (req: any, res: any) => {
   }
 });
 
+student.post("/update-student", async (req: any, res: any) => {
+  try {
+    const token = req.body.token;
+    const verifyToken: string = (await jwt.verify(token, SECRET)) as string;
+    if (!verifyToken) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Action",
+      });
+    }
+
+    const { username, password, name, id } = req.body.studentInfo;
+
+    if (!username || !password || !name) {
+      return res.json({
+        success: false,
+        message: "All information related to students must be provided",
+      });
+    }
+
+    const courseId = req.body.courseId;
+    if (!courseId) {
+      return res.json({
+        success: false,
+        message: "Please select a course before adding students",
+      });
+    }
+
+    const getCourse = await prisma.course.findFirst({
+      where: {
+        id: courseId,
+        ownedBy: verifyToken as string,
+      },
+    });
+
+    if (!getCourse) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Action, please try again",
+      });
+    }
+
+    await prisma.student.update({
+      where: {
+        id: id,
+      },
+      data: {
+        username: username,
+        password: password,
+        name: name,
+      },
+    });
+
+    // await prisma.course.update({
+    //   where: { id: courseId },
+    //   data: {
+    //     students: {
+    //       connect: { id: student.id },
+    //     },
+    //   },
+    // });
+
+    return res.json({
+      success: true,
+      message: "Student Info has been updated successfully",
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
+
 export default student;
