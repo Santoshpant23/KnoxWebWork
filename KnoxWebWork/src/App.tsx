@@ -9,6 +9,9 @@ import { TokenProvider } from "./components/TokenContext";
 import Profile from "./components/Profile";
 import AddNewCourse from "./components/AddNewCourse";
 import EditCourse from "./components/EditCourse";
+import EditExercises from "./components/EditExercises";
+import Course from "./components/Students/Course";
+import StudentLogin from "./components/Students/StudentLogin";
 
 function App() {
   return (
@@ -22,7 +25,9 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/add-new-course" element={<AddNewCourse />} />
           <Route path="/edit-course" element={<EditCourse />} />
-
+          <Route path="/edit-exercise" element={<EditExercises />} />
+          <Route path="/course/*" element={<Course />} />
+          <Route path="/student/login/" element={<StudentLogin />} />
         </Routes>
         <Footer />
       </BrowserRouter>

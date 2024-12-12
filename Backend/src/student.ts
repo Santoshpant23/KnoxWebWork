@@ -103,7 +103,7 @@ student.post("/add-students", async (req: any, res: any) => {
   }
 });
 
-student.get("/login", async (req: any, res: any) => {
+student.post("/login", async (req: any, res: any) => {
   try {
     const { username, password, courseId } = req.body;
 
@@ -129,13 +129,21 @@ student.get("/login", async (req: any, res: any) => {
       });
     }
 
-    //make a session cookie and send it to the user
-    //todo
+    const token = jwt.sign(
+      {
+        username,
+        courseId,
+      },
+      SECRET,
+      {
+        expiresIn: "5m",
+      }
+    );
 
     return res.json({
       success: true,
       message: "Success",
-      cookie: "raanaoifuoiasudfoaijfdcaosiudfaoi",
+      token,
     });
   } catch (e: any) {
     return res.json({
@@ -145,10 +153,62 @@ student.get("/login", async (req: any, res: any) => {
   }
 });
 
-student.get("./verify", (req: any, res: any) => {
+student.post("/verify", (req: any, res: any) => {
   try {
-    const cookie = req.body.cookie;
-    //will verift later and will do this part later
+    const token = req.body.studentToken;
+    const id = req.body.courseId;
+    let usernameInfo = "";
+    let courseIdInfo = "";
+    if (token == null || token == undefined) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Access, Please login",
+      });
+    }
+    if (id == null || id == undefined) {
+      return res.json({
+        success: false,
+        message: "No Course Clicked",
+      });
+    }
+    // console.log(token);
+
+    let verify: boolean | string = true;
+    jwt.verify(
+      token,
+      SECRET,
+      function (err: jwt.VerifyErrors | null, decoded: any) {
+        if (err) {
+          console.log(err.message);
+          verify = err.message;
+        } else {
+          const { username, courseId } = decoded;
+          console.log(
+            courseId + " is the id from token and the id clicked is " + id
+          );
+
+          if (courseId == id) {
+            usernameInfo = username;
+            courseIdInfo = courseId;
+          } else {
+            verify = "No such user found in given course";
+          }
+          // Store relevant info in variables
+        }
+      }
+    );
+
+    if (verify !== true) {
+      return res.json({
+        success: false,
+        message: verify,
+      });
+    }
+    return res.json({
+      usernameInfo,
+      courseIdInfo,
+      success: true,
+    });
   } catch (e: any) {
     return res.json({
       success: false,

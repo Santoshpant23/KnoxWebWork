@@ -106,7 +106,8 @@ export default function CoursePage() {
 
   function handleExerciseClick(exercise: { id: number; name: string }) {
     console.log("Exercise clicked:", exercise);
-    // Add logic here
+    const exerciseId = exercise.id;
+    navigate("/edit-exercise", { state: { exerciseId } })
   }
 
   async function updateStudent(){

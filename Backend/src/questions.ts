@@ -31,7 +31,7 @@ question.post("/add", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as { email: string };
+    const verifyToken = jwt.verify(token, SECRET) as string;
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -68,7 +68,7 @@ question.post("/add", async (req: any, res: any) => {
       });
     }
 
-    if (checkCourse.ownedBy != verifyToken.email) {
+    if (checkCourse.ownedBy != verifyToken) {
       return res.json({
         success: false,
         message:
@@ -78,7 +78,7 @@ question.post("/add", async (req: any, res: any) => {
 
     const qn = req.body.qn;
     const options: string[] = req.body.options;
-    const correct = req.body.correct;
+    const correct: number = req.body.correct;
 
     if (!qn || !options) {
       return res.json({
@@ -86,24 +86,15 @@ question.post("/add", async (req: any, res: any) => {
         message: "Please provide qn and options",
       });
     }
+    console.log(correct);
 
-    if (!correct) {
+    if (correct === null || correct === undefined) {
       return res.json({
         success: false,
         message: "Please give correct answer",
       });
     }
 
-    /*
-    model Question {
-  id         Int      @id @default(autoincrement())
-  question   String   @unique @default("Choose the correct")
-  options    String[]
-  correct    Int
-  exerciseId Int
-  exercise   Exercise @relation(fields: [exerciseId], references: [id])
-}
-    */
     await prisma.question.create({
       data: {
         question: qn,
@@ -155,6 +146,209 @@ question.get("/checkans", async (req: any, res: any) => {
     return res.json({
       success: true,
       isCorrect: false,
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
+
+question.delete("/delete", async (req: any, res: any) => {
+  try {
+    const { token, id } = req.body;
+
+    if (!token) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Action",
+      });
+    }
+
+    const verifyToken = jwt.verify(token, SECRET) as string;
+    if (!verifyToken) {
+      return res.json({
+        success: false,
+        message: "Invalid Login, please try logging in again",
+      });
+    }
+
+    const getQnOutOfId = await prisma.question.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!getQnOutOfId) {
+      return res.json({
+        success: false,
+        message: "No such qn found",
+      });
+    }
+
+    const getExercise = await prisma.exercise.findFirst({
+      where: {
+        id: getQnOutOfId.exerciseId,
+      },
+    });
+
+    if (!getExercise) {
+      return res.json({
+        success: false,
+        message:
+          "No associated exercise found to this qn, something went wrong",
+      });
+    }
+
+    const getCourse = await prisma.course.findFirst({
+      where: {
+        id: getExercise.courseId,
+      },
+    });
+
+    if (!getCourse) {
+      return res.json({
+        success: false,
+        message:
+          "No such course found that this qn belong to, something went wrong",
+      });
+    }
+
+    if (verifyToken != getCourse.ownedBy) {
+      return res.json({
+        success: false,
+        message: "Invalid Action, try again",
+      });
+    }
+
+    await prisma.question.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: "Success",
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
+
+question.post("/update-qn", async (req: any, res: any) => {
+  try {
+    const { token, exerciseId, questionId } = req.body;
+
+    if (!token) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    if (!exerciseId) {
+      return res.json({
+        success: false,
+        message: "Something went wrong, no exercise context provided",
+      });
+    }
+
+    const verifyToken = jwt.verify(token, SECRET) as string;
+    if (!verifyToken) {
+      return res.json({
+        success: false,
+        message: "Cannot verify user, please re-login",
+      });
+    }
+
+    const getExercise = await prisma.exercise.findFirst({
+      where: {
+        id: exerciseId,
+      },
+    });
+
+    if (!getExercise) {
+      return res.json({
+        success: false,
+        message: "Invalid Exercise, or the exercise no longer exist",
+      });
+    }
+
+    const courseID = getExercise.courseId;
+
+    const checkCourse = await prisma.course.findFirst({
+      where: {
+        id: courseID,
+      },
+    });
+
+    if (!checkCourse) {
+      return res.json({
+        success: false,
+        message:
+          "Exercise does not belong to any course, something is wrong with given exerciseId",
+      });
+    }
+
+    if (checkCourse.ownedBy != verifyToken) {
+      return res.json({
+        success: false,
+        message:
+          "Unauthorized Action, you have no such course associated to your profile",
+      });
+    }
+
+    const getQn = await prisma.question.findFirst({
+      where: {
+        id: questionId,
+      },
+    });
+
+    if (!getQn) {
+      return res.json({
+        success: false,
+        message: "Cannot find this qn, something went wrong",
+      });
+    }
+
+    const qn = req.body.qn;
+    const options: string[] = req.body.options;
+    const correct: number = req.body.correct;
+
+    if (!qn || !options) {
+      return res.json({
+        success: false,
+        message: "Please provide qn and options",
+      });
+    }
+
+    if (correct === null || correct === undefined) {
+      return res.json({
+        success: false,
+        message: "Please give correct answer",
+      });
+    }
+
+    await prisma.question.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        question: qn,
+        options: options,
+        correct: correct,
+        exerciseId: exerciseId,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: "Success",
     });
   } catch (e: any) {
     return res.json({

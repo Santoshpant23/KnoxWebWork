@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToken } from "./TokenContext";
 
 interface CourseProps {
+  id: number;
   name: string;
   ownedBy: string;
   students: { id: number; name: string }[];
@@ -11,13 +12,17 @@ interface CourseProps {
 }
 
 export default function Courses() {
-  const { token } = useToken();
+
+  const { token, studentToken } = useToken();
+ 
   const [courses, setCourses] = useState<CourseProps[] | null>(null);
   const [loading, setLoading] = useState(true); // To handle the loading state
 
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  const navigate  = useNavigate();
 
   async function fetchCourses() {
     try {
@@ -41,6 +46,16 @@ export default function Courses() {
       setCourses(null);
     } finally {
       setLoading(false); // Stop loading regardless of success or failure
+    }
+  }
+
+  function handleClick(course: CourseProps){
+    if(studentToken){
+      navigate(`/course/${course.name}-${course.term}`, {
+        state: { courseId: course.id }
+      });
+    } else{
+      navigate("/student/login", {state: {courseId: course.id, name: course.name, term: course.term}});
     }
   }
 
@@ -70,9 +85,11 @@ export default function Courses() {
                   key={index}
                   className="p-2 bg-slate-300 text-blue-900 hover:bg-blue-800 hover:text-white cursor-pointer m-2"
                 >
-                  <a href="/" className="font-bold">
+                 <p
+        className="font-bold" onClick={() => handleClick(course)}
+      >
                     {course.name+"-"+course.term}
-                  </a>
+                  </p>
                 </li>
               ))}
             </ul>

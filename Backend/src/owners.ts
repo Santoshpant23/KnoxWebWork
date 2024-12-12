@@ -33,7 +33,7 @@ owners.post("/signup", async (req: any, res: any) => {
       },
     });
 
-    const token = jwt.sign({ email }, SECRET);
+    const token = jwt.sign({ email, isOwner: true }, SECRET);
     res.json({
       token,
       success: true,
@@ -61,7 +61,7 @@ owners.post("/login", async (req: any, res: any) => {
       });
     }
 
-    const token = jwt.sign(getOwner.email, SECRET);
+    const token = jwt.sign({ email, isOwner: true }, SECRET);
     return res.json({
       token,
       success: true,
@@ -85,14 +85,22 @@ owners.get("/verify", (req: any, res: any) => {
       });
     }
 
-    const verify = jwt.verify(token, SECRET);
+    const verify = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verify) {
       return res.json({
         success: false,
         message: "Unauthorized Access",
       });
     }
-
+    if (!verify.isOwner) {
+      return res.json({
+        success: false,
+        message: "Not an owner/admin",
+      });
+    }
     return res.json({
       success: true,
     });

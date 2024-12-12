@@ -147,4 +147,67 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
   }
 });
 
+exercise.post("/get-exercise", async (req: any, res: any) => {
+  try {
+    const token = req.body.token;
+    const id = req.body.id;
+
+    const verifyToken = jwt.verify(token, SECRET) as string;
+    if (!verifyToken) {
+      return res.json({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+
+    const findExercise = await prisma.exercise.findFirst({
+      where: {
+        id: id,
+      },
+      include: {
+        questions: true,
+      },
+    });
+
+    if (!findExercise) {
+      return res.json({
+        success: false,
+        message: "Invalid Course selected",
+      });
+    }
+
+    const CourseIdOfThisExercise = findExercise.courseId;
+
+    const findTheOwnerOfThisCourse = await prisma.course.findFirst({
+      where: {
+        id: CourseIdOfThisExercise,
+      },
+    });
+
+    if (!findTheOwnerOfThisCourse) {
+      return res.json({
+        success: false,
+        message: "Invalid Action, try again",
+      });
+    }
+
+    if (findTheOwnerOfThisCourse.ownedBy != verifyToken) {
+      return res.json({
+        success: false,
+        message: "Not Authorized",
+      });
+    }
+
+    return res.json({
+      success: true,
+      exercise: findExercise,
+    });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
+
 export default exercise;

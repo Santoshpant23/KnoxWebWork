@@ -4,6 +4,8 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 interface TokenContextType {
   token: string | null;
   setToken: (token: string | null) => void;
+  studentToken: string | null;
+  setStudentToken: (studentToken: string | null) => void;
 }
 
 // Create the context
@@ -12,6 +14,7 @@ const TokenContext = createContext<TokenContextType | undefined>(undefined);
 // Provider component
 export const TokenProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [studentToken, setStudentToken] = useState<string | null>(localStorage.getItem("student-token"));
   // console.log(token + 
   //   " is the current token"
   //   );
@@ -41,8 +44,27 @@ export const TokenProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     
   };
 
+
+  // Update localStorage whenever the token changes
+  const updateStudentToken = (newToken: string | null) => {
+    // console.log("New token is given to me " + newToken);
+    
+    if (newToken) {
+      localStorage.setItem("student-token", newToken);
+      // console.log("LocalStorage is updated with new token " + newToken);
+      
+    } else {
+      localStorage.removeItem("student-token");
+      // console.log("Oops, current token is removed from localstorage ");
+      
+    }
+    setStudentToken(newToken);
+    // console.log("Token is updated in current context, so the current token is " + token);
+    
+  };
+
   return (
-    <TokenContext.Provider value={{ token, setToken: updateToken }}>
+    <TokenContext.Provider value={{ token, setToken: updateToken, studentToken, setStudentToken: updateStudentToken }}>
       {children}
     </TokenContext.Provider>
   );
