@@ -9,21 +9,34 @@ export default function(){
     const navigate = useNavigate();
 
     const {token, setToken} = useToken();
-    const [NameError, SetNameError] = useState (false);
-    const [EmailError, SetEmailError] = useState (false);
+    const [error, setError] = useState (false);
+    const [errorMessage, setErrorMessage] = useState("An error occured");
+
     
    async function handleSignup(){
 
 
         if(name.length < 1){
-                SetNameError(true);
+               setError(true);
+               setErrorMessage("Name cannot be empty");
         }  else if(!email.endsWith("@knox.edu")){
-            SetEmailError(true);
-        } else if (email.length<6){
-            alert("Please give a valid email");
+             setError(true);
+             setErrorMessage("Email should end with knox.edu");
+        } else if (email.length<11){
+            setError(true);
+             setErrorMessage("Enter a valid email");
         } else if(password.length<6){
-            alert("Password should be at least 6 letters long");
-        } else{
+            setError(true);
+             setErrorMessage("Make your password at least 6 characters long");
+        }
+         else if ( !/[!@#$%^&*]/.test(password) || !/\d/.test(password)){
+            setError(true);
+            setErrorMessage("Your password should contain at least a digit or a special character");
+        }
+        
+         
+        else{
+            setError(false);
            fetch("http://localhost:3003/admin/signup", {
                method: 'POST',
                headers: {
@@ -35,18 +48,22 @@ export default function(){
            }).then(async (response)=>{
             const data = await response.json();
             if(data.success){
-                alert(data.token);
+                // alert(data.token);
                 setName("");
                 setEmail("");
                 setPassword("");
                  await localStorage.setItem('token', data.token);
                  setToken(data.token);
                  navigate("/");
+                 setError(false);
             } else{
-                alert(data.message)
+                setError(true);
+                setErrorMessage(data.message);
             }
            })
+    
         }
+       
 
 
         
@@ -61,9 +78,8 @@ export default function(){
             Course Administration
             </div>
             <div className="mt-5">
-            {NameError == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >Name cannot be blank</div>}
-            {EmailError == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >Your email address should end with Knox.edu</div>}
-                
+            {error == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >{errorMessage}</div>}
+            {/* <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >{errorMessage}</div> */}
                 <p>
                     Please enter your username and password for <b>admin</b> below:
                 </p>
