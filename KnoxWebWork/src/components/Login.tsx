@@ -55,7 +55,7 @@ export default function (){
         Course Administration
         </div>
         <div className="mt-5">
-            {error == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-6 " >Invalid user ID or password</div>}
+            {error == true && <div className = "bg-red-100 rounded-md p-3 mb-3" >Invalid user ID or password</div>}
             <p>
                 Please enter your username and password for <b>admin</b> below:
             </p>
