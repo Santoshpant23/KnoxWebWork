@@ -9,12 +9,16 @@ export default function(){
     const navigate = useNavigate();
 
     const {token, setToken} = useToken();
+    const [NameError, SetNameError] = useState (false);
+    const [EmailError, SetEmailError] = useState (false);
     
    async function handleSignup(){
 
 
         if(name.length < 1){
-            alert("Please give a valid name");
+                SetNameError(true);
+        }  else if(!email.endsWith("@knox.edu")){
+            SetEmailError(true);
         } else if (email.length<6){
             alert("Please give a valid email");
         } else if(password.length<6){
@@ -57,6 +61,9 @@ export default function(){
             Course Administration
             </div>
             <div className="mt-5">
+            {NameError == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >Name cannot be blank</div>}
+            {EmailError == true && <div className = "bg-red-100 rounded-md p-3 mb-3 w-1/2" >Your email address should end with Knox.edu</div>}
+                
                 <p>
                     Please enter your username and password for <b>admin</b> below:
                 </p>
