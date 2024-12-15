@@ -13,6 +13,7 @@ import EditExercises from "./components/EditExercises";
 import Course from "./components/Students/Course";
 import StudentLogin from "./components/Students/StudentLogin";
 import SolveExercise from "./components/Students/Exercise";
+import SolveQuestion from "./components/Students/SolveQuestion";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/course/*" element={<Course />} />
           <Route path="/student/login/" element={<StudentLogin />} />
           <Route path="/solve-exercise" element={<SolveExercise/>} />
+          <Route path="/solve-question" element={<SolveQuestion/>} />
         </Routes>
         <Footer />
       </BrowserRouter>
