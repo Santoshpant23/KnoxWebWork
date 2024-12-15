@@ -136,7 +136,7 @@ student.post("/login", async (req: any, res: any) => {
       },
       SECRET,
       {
-        expiresIn: "5m",
+        expiresIn: "50m",
       }
     );
 
@@ -202,6 +202,7 @@ student.post("/verify", (req: any, res: any) => {
       return res.json({
         success: false,
         message: verify,
+        expired: true,
       });
     }
     return res.json({
