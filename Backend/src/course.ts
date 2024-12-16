@@ -32,7 +32,10 @@ course.get("/allcourses", async (req: Request, res: Response) => {
 course.post("/add-course", async (req, res) => {
   try {
     const token = req.body.token;
-    const verifyToken = jwt.verify(token, SECRET);
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       res.json({
         message: "Invalid Token",
@@ -40,10 +43,10 @@ course.post("/add-course", async (req, res) => {
       });
     }
 
-    const owner = verifyToken;
+    const owner = verifyToken.email;
 
     const getOwner = await prisma.owners.findFirst({
-      where: { email: verifyToken as string },
+      where: { email: verifyToken.email },
     });
 
     if (!getOwner) {
@@ -107,7 +110,10 @@ course.post("/mycourses", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = await jwt.verify(token, SECRET);
+    const verifyToken = (await jwt.verify(token, SECRET)) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       return res.json({
         message: "Cannot verify user, try again",
@@ -117,7 +123,7 @@ course.post("/mycourses", async (req: any, res: any) => {
 
     const findAllCourses = await prisma.course.findMany({
       where: {
-        ownedBy: verifyToken as string,
+        ownedBy: verifyToken.email as string,
       },
       include: {
         students: true,

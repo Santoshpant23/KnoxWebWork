@@ -115,7 +115,7 @@ owners.get("/verify", (req: any, res: any) => {
 owners.post("/details", async (req: any, res: any) => {
   try {
     const token = req.body.token;
-    // console.log("Token I got from profile page is " + token);
+    console.log("Token I got from profile page is " + token);
 
     if (!token) {
       return res.json({
@@ -125,9 +125,13 @@ owners.post("/details", async (req: any, res: any) => {
     }
     // console.log(token);
 
-    const verifyPerson = await jwt.verify(token, SECRET);
+    const verifyPerson = (await jwt.verify(token, SECRET)) as {
+      email: string;
+      isOwner: boolean;
+    };
     // console.log("Error is not above");
     // console.log("Verify Person got me  " + verifyPerson);
+    console.log(verifyPerson);
 
     if (!verifyPerson) {
       return res.json({
@@ -138,7 +142,7 @@ owners.post("/details", async (req: any, res: any) => {
 
     const getPerson = await prisma.owners.findFirst({
       where: {
-        email: verifyPerson as string,
+        email: verifyPerson.email,
       },
     });
 

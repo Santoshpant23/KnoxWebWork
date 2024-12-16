@@ -116,7 +116,10 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET);
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
 
     if (!verifyToken) {
       return res.json({
@@ -127,7 +130,7 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
 
     const getOwner = prisma.owners.findFirst({
       where: {
-        email: verifyToken as string,
+        email: verifyToken.email as string,
       },
     });
 
@@ -141,7 +144,7 @@ exercise.post("/add-exercise", async (req: any, res: any) => {
     const course = prisma.course.findFirst({
       where: {
         id: courseId,
-        ownedBy: verifyToken as string,
+        ownedBy: verifyToken.email as string,
       },
     });
 
@@ -210,7 +213,10 @@ exercise.post("/get-exercise", async (req: any, res: any) => {
     const token = req.body.token;
     const id = req.body.id;
 
-    const verifyToken = jwt.verify(token, SECRET) as string;
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -249,7 +255,7 @@ exercise.post("/get-exercise", async (req: any, res: any) => {
       });
     }
 
-    if (findTheOwnerOfThisCourse.ownedBy != verifyToken) {
+    if (findTheOwnerOfThisCourse.ownedBy != verifyToken.email) {
       return res.json({
         success: false,
         message: "Not Authorized",

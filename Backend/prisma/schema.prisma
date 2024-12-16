@@ -35,7 +35,7 @@ model Owners {
 
 model Student {
   id       Int    @id @default(autoincrement())
-  username String @unique
+  username String
   password String
   name     String
   courseId Int
@@ -54,7 +54,7 @@ model Exercise {
 
 model Question {
   id         Int      @id @default(autoincrement())
-  question   String   @unique @default("Choose the correct")
+  question   String   @default("Choose the correct")
   options    String[]
   correct    Int
   exerciseId Int

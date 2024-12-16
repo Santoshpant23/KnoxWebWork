@@ -23,8 +23,15 @@ student.post("/add-students", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET);
-    if (!verifyToken) {
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
+
+    console.log(token);
+    console.log(verifyToken);
+
+    if (!verifyToken || !verifyToken.email || !verifyToken.isOwner) {
       return res.json({
         success: false,
         message:
@@ -52,7 +59,7 @@ student.post("/add-students", async (req: any, res: any) => {
     const getCourse = await prisma.course.findFirst({
       where: {
         id: courseId,
-        ownedBy: verifyToken as string,
+        ownedBy: verifyToken.email,
       },
     });
 
@@ -172,7 +179,7 @@ student.post("/verify", (req: any, res: any) => {
       });
     }
     // console.log(token);
-
+    let isExpired = false;
     let verify: boolean | string = true;
     jwt.verify(
       token,
@@ -181,6 +188,7 @@ student.post("/verify", (req: any, res: any) => {
         if (err) {
           console.log(err.message);
           verify = err.message;
+          isExpired = true;
         } else {
           const { username, courseId } = decoded;
           console.log(
@@ -199,11 +207,19 @@ student.post("/verify", (req: any, res: any) => {
     );
 
     if (verify !== true) {
-      return res.json({
-        success: false,
-        message: verify,
-        expired: true,
-      });
+      if (isExpired) {
+        return res.json({
+          success: false,
+          message: verify,
+          expired: true,
+        });
+      } else {
+        return res.json({
+          success: false,
+          message: verify,
+          expired: false,
+        });
+      }
     }
     return res.json({
       usernameInfo,
@@ -284,6 +300,29 @@ student.post("/update-student", async (req: any, res: any) => {
       success: true,
       message: "Student Info has been updated successfully",
     });
+  } catch (e: any) {
+    return res.json({
+      success: false,
+      message: e.message,
+    });
+  }
+});
+
+student.post("/submit-answers", (req: any, res: any) => {
+  try {
+    const { token, question, option } = req.body;
+
+    const verifyToken = jwt.verify(token, SECRET) as {
+      username: string;
+      courseId: string;
+    };
+
+    if (!verifyToken.courseId || !verifyToken.username) {
+      return res.json({
+        success: false,
+        message: "Cannot verify user, try again",
+      });
+    }
   } catch (e: any) {
     return res.json({
       success: false,

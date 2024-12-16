@@ -31,7 +31,10 @@ question.post("/add", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as string;
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -68,7 +71,7 @@ question.post("/add", async (req: any, res: any) => {
       });
     }
 
-    if (checkCourse.ownedBy != verifyToken) {
+    if (checkCourse.ownedBy != verifyToken.email) {
       return res.json({
         success: false,
         message:
@@ -166,7 +169,10 @@ question.delete("/delete", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as string;
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -215,7 +221,7 @@ question.delete("/delete", async (req: any, res: any) => {
       });
     }
 
-    if (verifyToken != getCourse.ownedBy) {
+    if (verifyToken.email != getCourse.ownedBy) {
       return res.json({
         success: false,
         message: "Invalid Action, try again",
@@ -258,7 +264,10 @@ question.post("/update-qn", async (req: any, res: any) => {
       });
     }
 
-    const verifyToken = jwt.verify(token, SECRET) as string;
+    const verifyToken = jwt.verify(token, SECRET) as {
+      email: string;
+      isOwner: boolean;
+    };
     if (!verifyToken) {
       return res.json({
         success: false,
@@ -295,7 +304,7 @@ question.post("/update-qn", async (req: any, res: any) => {
       });
     }
 
-    if (checkCourse.ownedBy != verifyToken) {
+    if (checkCourse.ownedBy != verifyToken.email) {
       return res.json({
         success: false,
         message:
